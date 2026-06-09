@@ -3,7 +3,18 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Subliexpresate | Pedidos",
-  description: "Gestión simple de pedidos y presupuestos para Subliexpresate."
+  description: "Gestion simple de pedidos y presupuestos para Subliexpresate.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/icon-192.png"
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Pedidos",
+    statusBarStyle: "default"
+  }
 };
 
 export const viewport: Viewport = {
