@@ -1,10 +1,10 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { createId } from "@/lib/orderFactory";
-import { saveClient, saveProduct } from "@/lib/repository";
 import { formatARS } from "@/lib/calculations";
+import { createId } from "@/lib/orderFactory";
+import { deleteClient, deleteProduct, saveClient, saveProduct } from "@/lib/repository";
 import type { Client, FrequentProduct } from "@/types/order";
 
 export function ClientsManager({
@@ -30,7 +30,7 @@ export function ClientsManager({
           />
           <input
             className="input"
-            placeholder="Teléfono"
+            placeholder="Telefono"
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
           />
@@ -57,7 +57,20 @@ export function ClientsManager({
           </button>
         </div>
       </div>
-      <List items={clients.map((client) => [client.nombre, client.telefono || client.correo || ""])} />
+      <List
+        items={clients.map((client) => ({
+          id: client.id,
+          title: client.nombre,
+          detail: client.telefono || client.correo || "",
+          deleteLabel: "Borrar cliente"
+        }))}
+        emptyLabel="Todavia no hay clientes guardados."
+        onDelete={async (id) => {
+          if (!window.confirm("Borrar este cliente frecuente?")) return;
+          await deleteClient(id);
+          onChanged();
+        }}
+      />
     </section>
   );
 }
@@ -79,7 +92,7 @@ export function ProductsManager({
         <div className="grid gap-3">
           <input
             className="input"
-            placeholder="Descripción"
+            placeholder="Descripcion"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
           />
@@ -115,27 +128,64 @@ export function ProductsManager({
         </div>
       </div>
       <List
-        items={products.map((product) => [
-          product.descripcion,
-          formatARS(product.precioUnitario)
-        ])}
+        items={products.map((product) => ({
+          id: product.id,
+          title: product.descripcion,
+          detail: formatARS(product.precioUnitario),
+          deleteLabel: "Borrar producto"
+        }))}
+        emptyLabel="Todavia no hay productos guardados."
+        onDelete={async (id) => {
+          if (!window.confirm("Borrar este producto frecuente?")) return;
+          await deleteProduct(id);
+          onChanged();
+        }}
       />
     </section>
   );
 }
 
-function List({ items }: { items: string[][] }) {
+type ListItem = {
+  id: string;
+  title: string;
+  detail: string;
+  deleteLabel: string;
+};
+
+function List({
+  items,
+  emptyLabel,
+  onDelete
+}: {
+  items: ListItem[];
+  emptyLabel: string;
+  onDelete: (id: string) => Promise<void>;
+}) {
   return (
     <div className="mt-4 space-y-2">
-      {items.map(([title, detail]) => (
-        <div key={`${title}-${detail}`} className="rounded-lg bg-white px-4 py-3 shadow-soft">
-          <p className="font-black text-brand-ink">{title}</p>
-          {detail ? <p className="text-sm text-slate-600">{detail}</p> : null}
+      {items.map((item) => (
+        <div
+          key={item.id}
+          className="flex items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 shadow-soft"
+        >
+          <div className="min-w-0">
+            <p className="truncate font-black text-brand-ink">{item.title}</p>
+            {item.detail ? <p className="truncate text-sm text-slate-600">{item.detail}</p> : null}
+          </div>
+          <button
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-red-200 text-red-600"
+            type="button"
+            onClick={() => onDelete(item.id)}
+            aria-label={item.deleteLabel}
+            title={item.deleteLabel}
+          >
+            <Trash2 size={18} />
+          </button>
         </div>
       ))}
       {!items.length ? (
         <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm font-semibold text-slate-500">
-          Todavía no hay datos guardados.
+          {emptyLabel}
         </div>
       ) : null}
     </div>

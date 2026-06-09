@@ -103,6 +103,16 @@ export async function saveClient(client: Client): Promise<void> {
   writeStore(store);
 }
 
+export async function deleteClient(id: string): Promise<void> {
+  if (isFirebaseConfigured) {
+    await deleteCollectionDoc("clients", id);
+    return;
+  }
+  const store = readStore();
+  store.clients = store.clients.filter((item) => item.id !== id);
+  writeStore(store);
+}
+
 export async function listProducts(): Promise<FrequentProduct[]> {
   if (isFirebaseConfigured) return listCollection<FrequentProduct>("products");
   return readStore().products.sort((a, b) => a.descripcion.localeCompare(b.descripcion));
@@ -115,5 +125,15 @@ export async function saveProduct(product: FrequentProduct): Promise<void> {
   }
   const store = readStore();
   store.products = [product, ...store.products.filter((item) => item.id !== product.id)];
+  writeStore(store);
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  if (isFirebaseConfigured) {
+    await deleteCollectionDoc("products", id);
+    return;
+  }
+  const store = readStore();
+  store.products = store.products.filter((item) => item.id !== id);
   writeStore(store);
 }

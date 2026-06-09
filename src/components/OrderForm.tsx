@@ -1,14 +1,12 @@
 "use client";
 
 import { Plus, Save, Trash2, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { formatARS, itemAmount, subtotal, total } from "@/lib/calculations";
 import { createEmptyItem, createEmptyOrder, createId, touchOrder } from "@/lib/orderFactory";
 import { saveClient, saveOrder, saveProduct } from "@/lib/repository";
 import { PdfDownloadButton } from "@/components/PdfDownloadButton";
 import type { Client, FrequentProduct, Order, OrderItem } from "@/types/order";
-
-const DRAFT_KEY = "subliexpresate_order_draft";
 
 type Props = {
   order?: Order;
@@ -19,20 +17,7 @@ type Props = {
 };
 
 export function OrderForm({ order, clients, products, onSaved, onCancel }: Props) {
-  const [current, setCurrent] = useState<Order>(() => {
-    if (order) return order;
-    if (typeof window !== "undefined") {
-      const draft = window.localStorage.getItem(DRAFT_KEY);
-      if (draft) {
-        try {
-          return JSON.parse(draft) as Order;
-        } catch {
-          return createEmptyOrder();
-        }
-      }
-    }
-    return createEmptyOrder();
-  });
+  const [current, setCurrent] = useState<Order>(() => order ?? createEmptyOrder());
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -46,12 +31,6 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
   const hasProductValues = current.items.some(
     (item) => item.descripcion.trim() || item.cantidad !== "" || item.precioUnitario !== ""
   );
-
-  useEffect(() => {
-    if (!order && typeof window !== "undefined") {
-      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(current));
-    }
-  }, [current, order]);
 
   function updateField<K extends keyof Order>(field: K, value: Order[K]) {
     setCurrent((prev) => touchOrder({ ...prev, [field]: value }));
@@ -139,7 +118,6 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
       )
     );
 
-    if (!order && typeof window !== "undefined") window.localStorage.removeItem(DRAFT_KEY);
     setCurrent(nextOrder);
     setErrors([]);
     setMessage(status === "draft" ? "Borrador guardado." : "Pedido guardado.");

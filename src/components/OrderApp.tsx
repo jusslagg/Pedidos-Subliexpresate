@@ -38,6 +38,11 @@ export function OrderApp() {
     refresh();
   }, [refresh]);
 
+  function navigate(nextView: View) {
+    setEditing(undefined);
+    setView(nextView);
+  }
+
   return (
     <PinGate>
       <main className="min-h-screen pb-20">
@@ -45,10 +50,7 @@ export function OrderApp() {
           <HomeScreen
             loading={loading}
             storageLabel={isFirebaseConfigured ? "Firebase conectado" : "Modo local"}
-            onNavigate={(nextView) => {
-              setEditing(undefined);
-              setView(nextView);
-            }}
+            onNavigate={navigate}
           />
         ) : null}
 
@@ -82,7 +84,7 @@ export function OrderApp() {
         {view === "clients" ? <ClientsManager clients={clients} onChanged={refresh} /> : null}
         {view === "products" ? <ProductsManager products={products} onChanged={refresh} /> : null}
 
-        {view !== "home" ? <BottomNav active={view} onNavigate={setView} /> : null}
+        {view !== "home" ? <BottomNav active={view} onNavigate={navigate} /> : null}
       </main>
     </PinGate>
   );
