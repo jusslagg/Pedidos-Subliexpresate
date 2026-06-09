@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { formatARS, total } from "@/lib/calculations";
 import { formatInputDate } from "@/lib/dates";
 import { deleteOrder } from "@/lib/repository";
+import { CalendarButton } from "@/components/CalendarButton";
 import { PdfDownloadButton } from "@/components/PdfDownloadButton";
 import type { Order } from "@/types/order";
 
@@ -86,6 +87,7 @@ export function SavedOrders({ orders, onEdit, onDeleted }: Props) {
                     Editar
                   </button>
                   <PdfDownloadButton order={order} />
+                  <CalendarButton order={order} />
                   <button
                     className="flex h-12 items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-4 text-sm font-bold text-red-600"
                     type="button"

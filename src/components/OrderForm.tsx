@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { formatARS, itemAmount, subtotal, total } from "@/lib/calculations";
 import { createEmptyItem, createEmptyOrder, createId, touchOrder } from "@/lib/orderFactory";
 import { saveClient, saveOrder, saveProduct } from "@/lib/repository";
+import { CalendarButton } from "@/components/CalendarButton";
 import { PdfDownloadButton } from "@/components/PdfDownloadButton";
 import type { Client, FrequentProduct, Order, OrderItem } from "@/types/order";
 
@@ -354,7 +355,7 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
           </div>
         ) : null}
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-4">
           <button
             className="flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-sm font-bold text-brand-ink"
             type="button"
@@ -372,6 +373,7 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
             Guardar
           </button>
           <PdfDownloadButton order={current} />
+          <CalendarButton order={current} />
         </div>
       </div>
     </section>
