@@ -12,7 +12,7 @@ export function CalendarButton({ order }: { order: Order }) {
       disabled={!order.fechaEntrega}
       onClick={() => {
         const confirmed = window.confirm(
-          "Desea guardar la alarma de entrega en el calendario del telefono? Se creara un recordatorio un dia antes."
+          "Desea guardar la alarma de entrega en el calendario del telefono? Se creara un recordatorio 48 horas antes."
         );
         if (!confirmed) return;
         downloadDeliveryCalendar(order);

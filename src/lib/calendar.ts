@@ -69,7 +69,7 @@ export function downloadDeliveryCalendar(order: Order): void {
     "BEGIN:VALARM",
     "ACTION:DISPLAY",
     `DESCRIPTION:${escapeIcsText(`Recordatorio de entrega para ${client}`)}`,
-    "TRIGGER:-P1D",
+    "TRIGGER:-P2D",
     "END:VALARM",
     "END:VEVENT",
     "END:VCALENDAR"
