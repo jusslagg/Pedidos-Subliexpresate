@@ -1,6 +1,6 @@
 "use client";
 
-import { Boxes, CalendarDays, FilePlus2, Home, PackagePlus, UsersRound } from "lucide-react";
+import { BarChart3, Boxes, CalendarDays, FilePlus2, Home, PackagePlus, UsersRound } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { AgendaView } from "@/components/AgendaView";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -8,11 +8,12 @@ import { ClientsManager, ProductsManager } from "@/components/DirectoryManagers"
 import { OrderForm } from "@/components/OrderForm";
 import { PinGate } from "@/components/PinGate";
 import { SavedOrders } from "@/components/SavedOrders";
+import { SalesDashboard } from "@/components/SalesDashboard";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { listClients, listOrders, listProducts } from "@/lib/repository";
 import type { Client, FrequentProduct, Order } from "@/types/order";
 
-type View = "home" | "new" | "orders" | "agenda" | "clients" | "products";
+type View = "home" | "new" | "orders" | "agenda" | "sales" | "clients" | "products";
 
 export function OrderApp() {
   const [view, setView] = useState<View>("home");
@@ -92,6 +93,8 @@ export function OrderApp() {
           />
         ) : null}
 
+        {view === "sales" ? <SalesDashboard orders={orders} /> : null}
+
         {view === "clients" ? <ClientsManager clients={clients} onChanged={refresh} /> : null}
         {view === "products" ? <ProductsManager products={products} onChanged={refresh} /> : null}
 
@@ -113,6 +116,7 @@ function HomeScreen({
   const actions = [
     { label: "Nuevo pedido", view: "new" as View, icon: FilePlus2, color: "bg-brand-blue" },
     { label: "Agenda", view: "agenda" as View, icon: CalendarDays, color: "bg-brand-coral" },
+    { label: "Ventas", view: "sales" as View, icon: BarChart3, color: "bg-brand-teal" },
     { label: "Pedidos guardados", view: "orders" as View, icon: Boxes, color: "bg-brand-ink" },
     { label: "Clientes", view: "clients" as View, icon: UsersRound, color: "bg-brand-teal" },
     { label: "Productos frecuentes", view: "products" as View, icon: PackagePlus, color: "bg-brand-gold" }
@@ -156,13 +160,14 @@ function BottomNav({ active, onNavigate }: { active: View; onNavigate: (view: Vi
   const items = [
     { view: "home" as View, icon: Home, label: "Inicio" },
     { view: "agenda" as View, icon: CalendarDays, label: "Agenda" },
+    { view: "sales" as View, icon: BarChart3, label: "Ventas" },
     { view: "new" as View, icon: FilePlus2, label: "Pedido" },
     { view: "orders" as View, icon: Boxes, label: "Guardados" }
   ];
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white">
-      <div className="mx-auto grid h-16 max-w-3xl grid-cols-4">
+      <div className="mx-auto grid h-16 max-w-3xl grid-cols-5">
         {items.map((item) => {
           const Icon = item.icon;
           const selected = active === item.view;
