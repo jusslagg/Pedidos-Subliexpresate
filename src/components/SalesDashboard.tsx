@@ -1,7 +1,7 @@
 "use client";
 
 import { PackageCheck, UserRound } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatARS, total } from "@/lib/calculations";
 import { formatInputDate } from "@/lib/dates";
 import type { Order } from "@/types/order";
@@ -24,8 +24,21 @@ type RankRow = {
 
 export function SalesDashboard({ orders }: { orders: Order[] }) {
   const [period, setPeriod] = useState<Period>("day");
-  const report = useMemo(() => buildReport(orders), [orders]);
-  const rows = report[period];
+  const monthOptions = useMemo(() => saleMonths(orders), [orders]);
+  const [selectedMonth, setSelectedMonth] = useState("");
+
+  useEffect(() => {
+    if (!monthOptions.length) {
+      setSelectedMonth("");
+      return;
+    }
+    if (!selectedMonth || !monthOptions.some((month) => month.key === selectedMonth)) {
+      setSelectedMonth(monthOptions[0].key);
+    }
+  }, [monthOptions, selectedMonth]);
+
+  const report = useMemo(() => buildReport(orders, selectedMonth), [orders, selectedMonth]);
+  const rows = period === "month" ? report.month : report[period];
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-5">
@@ -38,13 +51,30 @@ export function SalesDashboard({ orders }: { orders: Order[] }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <MetricCard label="Total vendido" value={formatARS(report.totalAmount)} highlight />
-        <MetricCard label="Pedidos" value={String(report.orderCount)} />
-        <MetricCard label="Este mes" value={formatARS(report.monthAmount)} />
-        <MetricCard label="Esta semana" value={formatARS(report.weekAmount)} />
+        <MetricCard label="Mes seleccionado" value={formatARS(report.selectedAmount)} highlight />
+        <MetricCard label="Pedidos del mes" value={String(report.selectedOrderCount)} />
+        <MetricCard label="Unidades del mes" value={String(report.selectedUnits)} />
+        <MetricCard label="Total historico" value={formatARS(report.totalAmount)} />
       </div>
 
       <div className="mt-5 rounded-lg bg-white p-3 shadow-soft">
+        {monthOptions.length ? (
+          <label className="mb-3 block">
+            <span className="mb-1 block text-xs font-black uppercase text-slate-500">Mes</span>
+            <select
+              className="input"
+              value={selectedMonth}
+              onChange={(event) => setSelectedMonth(event.target.value)}
+            >
+              {monthOptions.map((month) => (
+                <option key={month.key} value={month.key}>
+                  {month.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
         <div className="grid grid-cols-3 gap-2 rounded-lg bg-slate-100 p-1">
           <PeriodButton active={period === "day"} onClick={() => setPeriod("day")}>
             Dia
@@ -53,7 +83,7 @@ export function SalesDashboard({ orders }: { orders: Order[] }) {
             Semana
           </PeriodButton>
           <PeriodButton active={period === "month"} onClick={() => setPeriod("month")}>
-            Mes
+            Meses
           </PeriodButton>
         </div>
 
@@ -184,31 +214,38 @@ function Ranking({
   );
 }
 
-function buildReport(orders: Order[]) {
+function buildReport(orders: Order[], selectedMonth: string) {
   const soldOrders = orders.filter((order) => order.status === "saved");
-  const today = new Date().toISOString().slice(0, 10);
-  const currentWeek = weekKey(today);
-  const currentMonth = monthKey(today);
+  const selectedOrders = selectedMonth
+    ? soldOrders.filter((order) => monthKey(order.fecha) === selectedMonth)
+    : soldOrders;
 
-  const day = groupOrders(soldOrders, (order) => order.fecha, (key) => formatInputDate(key));
-  const week = groupOrders(soldOrders, (order) => weekKey(order.fecha), weekLabel);
+  const day = groupOrders(selectedOrders, (order) => order.fecha, (key) => formatInputDate(key));
+  const week = groupOrders(selectedOrders, (order) => weekKey(order.fecha), weekLabel);
   const month = groupOrders(soldOrders, (order) => monthKey(order.fecha), monthLabel);
 
   return {
     totalAmount: soldOrders.reduce((sum, order) => sum + total(order.items), 0),
-    orderCount: soldOrders.length,
-    weekAmount: soldOrders
-      .filter((order) => weekKey(order.fecha) === currentWeek)
-      .reduce((sum, order) => sum + total(order.items), 0),
-    monthAmount: soldOrders
-      .filter((order) => monthKey(order.fecha) === currentMonth)
-      .reduce((sum, order) => sum + total(order.items), 0),
+    selectedAmount: selectedOrders.reduce((sum, order) => sum + total(order.items), 0),
+    selectedOrderCount: selectedOrders.length,
+    selectedUnits: selectedOrders.reduce((sum, order) => sum + orderUnits(order), 0),
     day,
     week,
     month,
-    products: rankProducts(soldOrders),
-    clients: rankClients(soldOrders)
+    products: rankProducts(selectedOrders),
+    clients: rankClients(selectedOrders)
   };
+}
+
+function saleMonths(orders: Order[]): Array<{ key: string; label: string }> {
+  const keys = new Set(
+    orders
+      .filter((order) => order.status === "saved" && order.fecha)
+      .map((order) => monthKey(order.fecha))
+  );
+  return Array.from(keys)
+    .sort((a, b) => b.localeCompare(a))
+    .map((key) => ({ key, label: monthLabel(key) }));
 }
 
 function groupOrders(
