@@ -146,11 +146,10 @@ export function OrderPdfDocument({ order }: { order: Order }) {
 
         <View style={styles.grid}>
           <View style={styles.row}>
-            <Text style={[styles.half, styles.label]}>DNI: {order.dni}</Text>
             <Text style={[styles.half, styles.label]}>CORREO: {order.correo}</Text>
+            <Text style={[styles.half, styles.label]}>TELEFONO: {order.telefono}</Text>
           </View>
           <Text style={styles.label}>LUGAR: {order.lugar}</Text>
-          <Text style={styles.label}>TELEFONO: {order.telefono}</Text>
           <Text style={styles.label}>Fecha de entrega: {formatInputDate(order.fechaEntrega)}</Text>
         </View>
 

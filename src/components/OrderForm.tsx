@@ -2,11 +2,11 @@
 
 import { Plus, Save, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { CalendarButton } from "@/components/CalendarButton";
+import { PdfDownloadButton } from "@/components/PdfDownloadButton";
 import { formatARS, itemAmount, subtotal, total } from "@/lib/calculations";
 import { createEmptyItem, createEmptyOrder, createId, touchOrder } from "@/lib/orderFactory";
 import { saveClient, saveOrder, saveProduct } from "@/lib/repository";
-import { CalendarButton } from "@/components/CalendarButton";
-import { PdfDownloadButton } from "@/components/PdfDownloadButton";
 import type { Client, FrequentProduct, Order, OrderItem } from "@/types/order";
 
 type Props = {
@@ -55,7 +55,6 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
       touchOrder({
         ...prev,
         clienteNombre: found.nombre,
-        dni: found.dni ?? "",
         lugar: found.lugar ?? "",
         telefono: found.telefono ?? "",
         correo: found.correo ?? ""
@@ -74,8 +73,8 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
   async function persist(status: Order["status"]) {
     const cleanItems = current.items.filter((item) => item.descripcion.trim());
     const validation = [
-      !current.clienteNombre.trim() ? "Ingresá el nombre del cliente." : "",
-      cleanItems.length === 0 ? "Agregá al menos un producto con descripción." : ""
+      !current.clienteNombre.trim() ? "Ingresa el nombre del cliente." : "",
+      cleanItems.length === 0 ? "Agrega al menos un producto con descripcion." : ""
     ].filter(Boolean);
 
     if (validation.length) {
@@ -99,7 +98,6 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
     await saveClient({
       id: createId("cliente"),
       nombre: nextOrder.clienteNombre,
-      dni: nextOrder.dni,
       lugar: nextOrder.lugar,
       telefono: nextOrder.telefono,
       correo: nextOrder.correo,
@@ -184,22 +182,22 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
               </datalist>
             </Field>
             <div className="grid gap-3 sm:grid-cols-2">
-              <Field label="DNI">
-                <input
-                  className="input"
-                  inputMode="numeric"
-                  placeholder="Ej: 30123456"
-                  value={current.dni}
-                  onChange={(event) => updateField("dni", event.target.value)}
-                />
-              </Field>
-              <Field label="Teléfono">
+              <Field label="Telefono">
                 <input
                   className="input"
                   inputMode="tel"
                   placeholder="Ej: 11 2345 6789"
                   value={current.telefono}
                   onChange={(event) => updateField("telefono", event.target.value)}
+                />
+              </Field>
+              <Field label="Correo">
+                <input
+                  className="input"
+                  type="email"
+                  placeholder="Ej: cliente@email.com"
+                  value={current.correo}
+                  onChange={(event) => updateField("correo", event.target.value)}
                 />
               </Field>
             </div>
@@ -209,15 +207,6 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
                 placeholder="Ej: Quilmes"
                 value={current.lugar}
                 onChange={(event) => updateField("lugar", event.target.value)}
-              />
-            </Field>
-            <Field label="Correo">
-              <input
-                className="input"
-                type="email"
-                placeholder="Ej: cliente@email.com"
-                value={current.correo}
-                onChange={(event) => updateField("correo", event.target.value)}
               />
             </Field>
             <Field label="Observaciones">
@@ -261,7 +250,7 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
                     className="flex h-10 w-10 items-center justify-center rounded-lg border border-red-200 text-red-600"
                     type="button"
                     onClick={() => {
-                      if (!window.confirm("¿Eliminar este producto del pedido?")) return;
+                      if (!window.confirm("Eliminar este producto del pedido?")) return;
                       setCurrent((prev) =>
                         touchOrder({
                           ...prev,
@@ -278,7 +267,7 @@ export function OrderForm({ order, clients, products, onSaved, onCancel }: Props
                   </button>
                 </div>
                 <div className="grid gap-3">
-                  <Field label="Descripción">
+                  <Field label="Descripcion">
                     <input
                       className="input"
                       list="productos"

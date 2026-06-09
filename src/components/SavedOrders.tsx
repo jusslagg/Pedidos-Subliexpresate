@@ -2,11 +2,11 @@
 
 import { Edit3, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { CalendarButton } from "@/components/CalendarButton";
+import { PdfDownloadButton } from "@/components/PdfDownloadButton";
 import { formatARS, total } from "@/lib/calculations";
 import { formatInputDate } from "@/lib/dates";
 import { deleteOrder } from "@/lib/repository";
-import { CalendarButton } from "@/components/CalendarButton";
-import { PdfDownloadButton } from "@/components/PdfDownloadButton";
 import type { Order } from "@/types/order";
 
 type Props = {
@@ -31,7 +31,7 @@ export function SavedOrders({ orders, onEdit, onDeleted }: Props) {
     <section className="mx-auto max-w-3xl px-4 py-5">
       <div className="mb-4">
         <h1 className="text-2xl font-black text-brand-ink">Pedidos guardados</h1>
-        <p className="mt-1 text-sm text-slate-600">Buscá, editá y volvé a generar el PDF.</p>
+        <p className="mt-1 text-sm text-slate-600">Busca, edita y vuelve a generar el PDF.</p>
       </div>
       <div className="mb-4 flex h-12 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3">
         <Search size={20} className="text-slate-400" />
@@ -55,7 +55,7 @@ export function SavedOrders({ orders, onEdit, onDeleted }: Props) {
                 <div>
                   <h2 className="text-base font-black text-brand-ink">{order.clienteNombre}</h2>
                   <p className="text-sm text-slate-600">
-                    {formatInputDate(order.fecha)} · {order.items.length} producto(s)
+                    {formatInputDate(order.fecha)} - {order.items.length} producto(s)
                   </p>
                 </div>
                 <span className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-black text-brand-ink">
@@ -68,13 +68,13 @@ export function SavedOrders({ orders, onEdit, onDeleted }: Props) {
               <div className="mt-4 border-t border-slate-200 pt-4">
                 <div className="space-y-2 text-sm text-slate-700">
                   <p>
-                    <strong>DNI:</strong> {order.dni || "-"}
-                  </p>
-                  <p>
-                    <strong>Teléfono:</strong> {order.telefono || "-"}
+                    <strong>Telefono:</strong> {order.telefono || "-"}
                   </p>
                   <p>
                     <strong>Entrega:</strong> {formatInputDate(order.fechaEntrega) || "-"}
+                  </p>
+                  <p>
+                    <strong>Lugar:</strong> {order.lugar || "-"}
                   </p>
                 </div>
                 <div className="mt-4 grid gap-2">
@@ -92,7 +92,7 @@ export function SavedOrders({ orders, onEdit, onDeleted }: Props) {
                     className="flex h-12 items-center justify-center gap-2 rounded-lg border border-red-200 bg-white px-4 text-sm font-bold text-red-600"
                     type="button"
                     onClick={async () => {
-                      if (!window.confirm("¿Borrar este pedido guardado?")) return;
+                      if (!window.confirm("Borrar este pedido guardado?")) return;
                       await deleteOrder(order.id);
                       onDeleted();
                     }}
