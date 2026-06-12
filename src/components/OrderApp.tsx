@@ -86,6 +86,7 @@ export function OrderApp() {
         {view === "agenda" ? (
           <AgendaView
             orders={orders}
+            onChanged={refresh}
             onEdit={(order) => {
               setEditing(order);
               setView("new");

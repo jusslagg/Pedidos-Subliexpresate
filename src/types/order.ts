@@ -35,6 +35,7 @@ export interface Order {
   telefono: string;
   correo: string;
   fechaEntrega: string;
+  deliveredAt?: string;
   observaciones: string;
   items: OrderItem[];
   status: OrderStatus;

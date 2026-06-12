@@ -1,12 +1,13 @@
 "use client";
 
-import { PackageCheck, UserRound } from "lucide-react";
+import { PackageCheck, TrendingUp, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { formatARS, total } from "@/lib/calculations";
 import { formatInputDate } from "@/lib/dates";
 import type { Order } from "@/types/order";
 
 type Period = "day" | "week" | "month";
+type SalesTab = "sales" | "investment";
 
 type Row = {
   key: string;
@@ -22,10 +23,39 @@ type RankRow = {
   units: number;
 };
 
+type InvestmentRow = RankRow & {
+  investment: number;
+  profit: number;
+  profitPercent: number | null;
+};
+
+const INVESTMENT_STORAGE_KEY = "subliexpresate.salesInvestments.v1";
+
 export function SalesDashboard({ orders }: { orders: Order[] }) {
+  const [tab, setTab] = useState<SalesTab>("sales");
   const [period, setPeriod] = useState<Period>("day");
   const monthOptions = useMemo(() => saleMonths(orders), [orders]);
   const [selectedMonth, setSelectedMonth] = useState("");
+  const [investments, setInvestments] = useState<Record<string, number>>({});
+  const [investmentsLoaded, setInvestmentsLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(INVESTMENT_STORAGE_KEY);
+      if (stored) {
+        setInvestments(JSON.parse(stored));
+      }
+    } catch {
+      setInvestments({});
+    } finally {
+      setInvestmentsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!investmentsLoaded) return;
+    window.localStorage.setItem(INVESTMENT_STORAGE_KEY, JSON.stringify(investments));
+  }, [investments, investmentsLoaded]);
 
   useEffect(() => {
     if (!monthOptions.length) {
@@ -37,8 +67,25 @@ export function SalesDashboard({ orders }: { orders: Order[] }) {
     }
   }, [monthOptions, selectedMonth]);
 
-  const report = useMemo(() => buildReport(orders, selectedMonth), [orders, selectedMonth]);
+  const report = useMemo(
+    () => buildReport(orders, selectedMonth, investments),
+    [orders, selectedMonth, investments]
+  );
   const rows = period === "month" ? report.month : report[period];
+
+  function updateInvestment(label: string, value: string) {
+    const key = investmentKey(selectedMonth, label);
+    const nextValue = Number(value);
+    setInvestments((current) => {
+      const next = { ...current };
+      if (!value || !Number.isFinite(nextValue) || nextValue <= 0) {
+        delete next[key];
+      } else {
+        next[key] = nextValue;
+      }
+      return next;
+    });
+  }
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-5">
@@ -50,11 +97,33 @@ export function SalesDashboard({ orders }: { orders: Order[] }) {
         </p>
       </div>
 
+      <div className="mb-4 grid grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1">
+        <TabButton active={tab === "sales"} onClick={() => setTab("sales")}>
+          Ventas
+        </TabButton>
+        <TabButton active={tab === "investment"} onClick={() => setTab("investment")}>
+          Inversion
+        </TabButton>
+      </div>
+
       <div className="grid grid-cols-2 gap-3">
-        <MetricCard label="Mes seleccionado" value={formatARS(report.selectedAmount)} highlight />
-        <MetricCard label="Pedidos del mes" value={String(report.selectedOrderCount)} />
-        <MetricCard label="Unidades del mes" value={String(report.selectedUnits)} />
-        <MetricCard label="Total historico" value={formatARS(report.totalAmount)} />
+        {tab === "sales" ? (
+          <>
+            <MetricCard label="Mes seleccionado" value={formatARS(report.selectedAmount)} highlight />
+            <MetricCard label="Pedidos del mes" value={String(report.selectedOrderCount)} />
+            <MetricCard label="Unidades del mes" value={String(report.selectedUnits)} />
+            <MetricCard label="Total historico" value={formatARS(report.totalAmount)} />
+          </>
+        ) : (
+          <>
+            <MetricCard label="Ganancia del mes" value={formatARS(report.selectedProfit)} highlight />
+            <MetricCard label="% ganancia del mes" value={formatPercent(report.selectedProfitPercent)} />
+            <MetricCard label="Inversion del mes" value={formatARS(report.selectedInvestment)} />
+            <MetricCard label="Ganancia historica" value={formatARS(report.totalProfit)} />
+            <MetricCard label="% ganancia historica" value={formatPercent(report.totalProfitPercent)} />
+            <MetricCard label="Inversion historica" value={formatARS(report.totalInvestment)} />
+          </>
+        )}
       </div>
 
       <div className="mt-5 rounded-lg bg-white p-3 shadow-soft">
@@ -75,44 +144,70 @@ export function SalesDashboard({ orders }: { orders: Order[] }) {
           </label>
         ) : null}
 
-        <div className="grid grid-cols-3 gap-2 rounded-lg bg-slate-100 p-1">
-          <PeriodButton active={period === "day"} onClick={() => setPeriod("day")}>
-            Dia
-          </PeriodButton>
-          <PeriodButton active={period === "week"} onClick={() => setPeriod("week")}>
-            Semana
-          </PeriodButton>
-          <PeriodButton active={period === "month"} onClick={() => setPeriod("month")}>
-            Meses
-          </PeriodButton>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          {rows.map((row) => (
-            <SalesRow key={row.key} row={row} max={rows[0]?.amount ?? 0} />
-          ))}
-          {!rows.length ? (
-            <div className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm font-semibold text-slate-500">
-              Todavia no hay ventas para analizar.
+        {tab === "sales" ? (
+          <>
+            <div className="grid grid-cols-3 gap-2 rounded-lg bg-slate-100 p-1">
+              <PeriodButton active={period === "day"} onClick={() => setPeriod("day")}>
+                Dia
+              </PeriodButton>
+              <PeriodButton active={period === "week"} onClick={() => setPeriod("week")}>
+                Semana
+              </PeriodButton>
+              <PeriodButton active={period === "month"} onClick={() => setPeriod("month")}>
+                Meses
+              </PeriodButton>
             </div>
-          ) : null}
-        </div>
+
+            <div className="mt-4 space-y-3">
+              {rows.map((row) => (
+                <SalesRow key={row.key} row={row} max={rows[0]?.amount ?? 0} />
+              ))}
+              {!rows.length ? (
+                <EmptyState>Todavia no hay ventas para analizar.</EmptyState>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <div className="space-y-3">
+            {report.investmentProducts.map((row) => (
+              <InvestmentProductRow
+                key={row.label}
+                row={row}
+                onChange={(value) => updateInvestment(row.label, value)}
+              />
+            ))}
+            {!report.investmentProducts.length ? (
+              <EmptyState>Todavia no hay productos vendidos para cargar inversiones.</EmptyState>
+            ) : null}
+          </div>
+        )}
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <Ranking
-          icon={<PackageCheck size={18} />}
-          title="Productos mas vendidos"
-          rows={report.products}
-          empty="Sin productos vendidos."
-        />
-        <Ranking
-          icon={<UserRound size={18} />}
-          title="Clientes destacados"
-          rows={report.clients}
-          empty="Sin clientes para mostrar."
-        />
-      </div>
+      {tab === "sales" ? (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <Ranking
+            icon={<PackageCheck size={18} />}
+            title="Productos mas vendidos"
+            rows={report.products}
+            empty="Sin productos vendidos."
+          />
+          <Ranking
+            icon={<UserRound size={18} />}
+            title="Clientes destacados"
+            rows={report.clients}
+            empty="Sin clientes para mostrar."
+          />
+        </div>
+      ) : (
+        <div className="mt-5">
+          <Ranking
+            icon={<TrendingUp size={18} />}
+            title="Ganancia por producto"
+            rows={report.profitProducts}
+            empty="Sin ganancias para mostrar."
+          />
+        </div>
+      )}
     </section>
   );
 }
@@ -160,6 +255,28 @@ function PeriodButton({
   );
 }
 
+function TabButton({
+  active,
+  onClick,
+  children
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      className={`h-11 rounded-lg text-sm font-black ${
+        active ? "bg-white text-brand-blue shadow-sm" : "text-slate-500"
+      }`}
+      type="button"
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
 function SalesRow({ row, max }: { row: Row; max: number }) {
   const width = max > 0 ? Math.max(8, Math.round((row.amount / max) * 100)) : 0;
 
@@ -177,6 +294,46 @@ function SalesRow({ row, max }: { row: Row; max: number }) {
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
         <div className="h-full rounded-full bg-brand-blue" style={{ width: `${width}%` }} />
       </div>
+    </article>
+  );
+}
+
+function InvestmentProductRow({
+  row,
+  onChange
+}: {
+  row: InvestmentRow;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <article className="rounded-lg border border-slate-200 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-sm font-black text-brand-ink">{row.label}</h2>
+          <p className="text-xs font-semibold text-slate-500">
+            Vendido: {formatARS(row.amount)} - {row.units} unidad(es)
+          </p>
+        </div>
+        <div className="text-right">
+          <p className={`text-sm font-black ${row.profit >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+            {formatARS(row.profit)}
+          </p>
+          <p className="text-xs font-black text-slate-500">{formatPercent(row.profitPercent)}</p>
+        </div>
+      </div>
+
+      <label className="mt-3 block">
+        <span className="mb-1 block text-xs font-black uppercase text-slate-500">Inversion</span>
+        <input
+          className="input"
+          min="0"
+          inputMode="decimal"
+          placeholder="$ 0"
+          type="number"
+          value={row.investment || ""}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      </label>
     </article>
   );
 }
@@ -214,7 +371,19 @@ function Ranking({
   );
 }
 
-function buildReport(orders: Order[], selectedMonth: string) {
+function EmptyState({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm font-semibold text-slate-500">
+      {children}
+    </div>
+  );
+}
+
+function buildReport(
+  orders: Order[],
+  selectedMonth: string,
+  investments: Record<string, number>
+) {
   const soldOrders = orders.filter((order) => order.status === "saved");
   const selectedOrders = selectedMonth
     ? soldOrders.filter((order) => monthKey(order.fecha) === selectedMonth)
@@ -224,16 +393,34 @@ function buildReport(orders: Order[], selectedMonth: string) {
   const week = groupOrders(selectedOrders, (order) => weekKey(order.fecha), weekLabel);
   const month = groupOrders(soldOrders, (order) => monthKey(order.fecha), monthLabel);
 
+  const totalAmount = soldOrders.reduce((sum, order) => sum + total(order.items), 0);
+  const selectedAmount = selectedOrders.reduce((sum, order) => sum + total(order.items), 0);
+  const totalInvestment = investmentTotalForAllMonths(soldOrders, investments);
+  const selectedInvestment = investmentTotalForOrders(selectedOrders, selectedMonth, investments);
+  const totalProfit = totalAmount - totalInvestment;
+  const selectedProfit = selectedAmount - selectedInvestment;
+
   return {
-    totalAmount: soldOrders.reduce((sum, order) => sum + total(order.items), 0),
-    selectedAmount: selectedOrders.reduce((sum, order) => sum + total(order.items), 0),
+    totalAmount,
+    selectedAmount,
     selectedOrderCount: selectedOrders.length,
     selectedUnits: selectedOrders.reduce((sum, order) => sum + orderUnits(order), 0),
+    totalInvestment,
+    selectedInvestment,
+    totalProfit,
+    selectedProfit,
+    totalProfitPercent: profitPercent(totalProfit, totalInvestment),
+    selectedProfitPercent: profitPercent(selectedProfit, selectedInvestment),
     day,
     week,
     month,
     products: rankProducts(selectedOrders),
-    clients: rankClients(selectedOrders)
+    clients: rankClients(selectedOrders),
+    investmentProducts: investmentProducts(selectedOrders, selectedMonth, investments),
+    profitProducts: investmentProducts(selectedOrders, selectedMonth, investments)
+      .filter((row) => row.investment > 0)
+      .sort((a, b) => b.profit - a.profit)
+      .slice(0, 5)
   };
 }
 
@@ -273,6 +460,10 @@ function groupOrders(
 }
 
 function rankProducts(orders: Order[]): RankRow[] {
+  return productRows(orders).slice(0, 5);
+}
+
+function productRows(orders: Order[]): RankRow[] {
   const map = new Map<string, RankRow>();
   orders.forEach((order) => {
     order.items.forEach((item) => {
@@ -284,8 +475,7 @@ function rankProducts(orders: Order[]): RankRow[] {
     });
   });
   return Array.from(map.values())
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, 5);
+    .sort((a, b) => b.amount - a.amount);
 }
 
 function rankClients(orders: Order[]): RankRow[] {
@@ -300,6 +490,64 @@ function rankClients(orders: Order[]): RankRow[] {
   return Array.from(map.values())
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 5);
+}
+
+function investmentProducts(
+  orders: Order[],
+  selectedMonth: string,
+  investments: Record<string, number>
+): InvestmentRow[] {
+  return productRows(orders)
+    .map((row) => {
+      const investment = investments[investmentKey(selectedMonth, row.label)] ?? 0;
+      const profit = row.amount - investment;
+      return {
+        ...row,
+        investment,
+        profit,
+        profitPercent: profitPercent(profit, investment)
+      };
+    })
+    .sort((a, b) => b.amount - a.amount);
+}
+
+function investmentTotalForOrders(
+  orders: Order[],
+  selectedMonth: string,
+  investments: Record<string, number>
+): number {
+  const labels = new Set<string>();
+  orders.forEach((order) => {
+    order.items.forEach((item) => labels.add(item.descripcion || "Sin descripcion"));
+  });
+  return Array.from(labels).reduce(
+    (sum, label) => sum + (investments[investmentKey(selectedMonth, label)] ?? 0),
+    0
+  );
+}
+
+function investmentTotalForAllMonths(orders: Order[], investments: Record<string, number>): number {
+  const keys = new Set<string>();
+  orders.forEach((order) => {
+    order.items.forEach((item) => {
+      keys.add(investmentKey(monthKey(order.fecha), item.descripcion || "Sin descripcion"));
+    });
+  });
+  return Array.from(keys).reduce((sum, key) => sum + (investments[key] ?? 0), 0);
+}
+
+function investmentKey(month: string, label: string): string {
+  return `${month || "sin-mes"}::${label.trim().toLowerCase() || "sin descripcion"}`;
+}
+
+function profitPercent(profit: number, investment: number): number | null {
+  if (investment <= 0) return null;
+  return (profit / investment) * 100;
+}
+
+function formatPercent(value: number | null): string {
+  if (value === null || !Number.isFinite(value)) return "-";
+  return `${value.toFixed(1)}%`;
 }
 
 function orderUnits(order: Order): number {
