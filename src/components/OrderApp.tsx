@@ -9,7 +9,6 @@ import { OrderForm } from "@/components/OrderForm";
 import { PinGate } from "@/components/PinGate";
 import { SavedOrders } from "@/components/SavedOrders";
 import { SalesDashboard } from "@/components/SalesDashboard";
-import { isFirebaseConfigured } from "@/lib/firebase";
 import { listClients, listOrders, listProducts } from "@/lib/repository";
 import type { Client, FrequentProduct, Order } from "@/types/order";
 
@@ -51,7 +50,6 @@ export function OrderApp() {
         {view === "home" ? (
           <HomeScreen
             loading={loading}
-            storageLabel={isFirebaseConfigured ? "Firebase conectado" : "Modo local"}
             onNavigate={navigate}
           />
         ) : null}
@@ -107,11 +105,9 @@ export function OrderApp() {
 
 function HomeScreen({
   loading,
-  storageLabel,
   onNavigate
 }: {
   loading: boolean;
-  storageLabel: string;
   onNavigate: (view: View) => void;
 }) {
   const actions = [
@@ -127,10 +123,6 @@ function HomeScreen({
     <section className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-8">
       <header className="mb-8 pt-3">
         <BrandLogo />
-        <div className="mt-5 flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-soft">
-          <span className="text-sm font-bold text-slate-700">{storageLabel}</span>
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-        </div>
       </header>
 
       <div className="grid flex-1 content-start gap-4">
