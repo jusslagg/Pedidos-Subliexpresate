@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "N?R ? Dise?o en Evoluci?n | Pedidos",
-  description: "Gestion simple de pedidos y presupuestos para N?R ? Dise?o en Evoluci?n.",
-  manifest: "/manifest.webmanifest",
+  title: "NÖR — Diseño en Evolución | Pedidos",
+  description: "Gestión simple de pedidos y presupuestos para NÖR — Diseño en Evolución.",
+  manifest: "/manifest.webmanifest?v=nor-2",
   icons: {
-    icon: "/nor-icon.svg",
-    shortcut: "/nor-icon.svg",
-    apple: "/nor-logo.jpg"
+    icon: "/favicon.png?v=nor-2",
+    shortcut: "/favicon.png?v=nor-2",
+    apple: "/apple-touch-icon.png?v=nor-2"
   },
   appleWebApp: {
     capable: true,
