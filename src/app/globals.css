@@ -19,7 +19,11 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(23, 120, 184, 0.14), transparent 28rem),
+    radial-gradient(
+      circle at top left,
+      rgba(23, 120, 184, 0.14),
+      transparent 28rem
+    ),
     linear-gradient(180deg, #ffffff 0%, #f3f6f9 100%);
 }
 
@@ -44,4 +48,414 @@ select {
 .input:focus {
   border-color: #1778b8;
   box-shadow: 0 0 0 4px rgba(23, 120, 184, 0.14);
+}
+
+/* NÖR: the original artwork is framed without altering the supplied logo. */
+.nor-logo {
+  width: 100%;
+  aspect-ratio: 1440 / 824;
+  background: white url("/nor-logo.jpg") no-repeat 50% 42.65%;
+  background-size: 243.61% auto;
+}
+.quote-workspace {
+  max-width: 1440px;
+  margin: auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+  color: #101010;
+}
+.quote-editor {
+  background: #fff;
+  border: 1px solid #ded8d0;
+  border-radius: 14px;
+  padding: 24px;
+}
+.quote-editor-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.quote-editor-header h1 {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -0.7px;
+}
+.quote-editor-header p {
+  font-size: 11px;
+  color: #777;
+  margin-top: 5px;
+}
+.quote-small-button {
+  border: 1px solid #ded8d0;
+  border-radius: 18px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  min-height: 32px;
+}
+.quote-close {
+  padding: 5px;
+}
+.quote-section {
+  margin-bottom: 26px;
+}
+.quote-section h2,
+.quote-item h2 {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+.quote-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.quote-section-title h2 {
+  margin: 0;
+}
+.quote-status {
+  display: inline-block;
+  border-radius: 12px;
+  background: #fff1ce;
+  color: #946200;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.quote-data-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px 10px;
+}
+.quote-data-grid > :first-child {
+  grid-column: span 2;
+}
+.quote-field {
+  display: block;
+  min-width: 0;
+}
+.quote-field > span {
+  display: block;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #706960;
+  margin-bottom: 6px;
+}
+.quote-editor .input {
+  min-height: 38px;
+  font-size: 12px;
+  border-color: #ded8d0;
+  color: #101010;
+  padding: 8px 10px;
+}
+.quote-editor .input:focus {
+  border-color: #e65018;
+  box-shadow: 0 0 0 3px #e650181a;
+}
+.quote-add,
+.quote-primary {
+  background: #e65018;
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 9px;
+  padding: 9px 12px;
+}
+.quote-add {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 20px;
+  padding: 7px 10px;
+}
+.quote-item {
+  border: 1px solid #ded8d0;
+  border-radius: 10px;
+  background: #f7f5f2;
+  padding: 10px;
+}
+.quote-item-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #706960;
+  margin-bottom: 10px;
+}
+.quote-item-title strong {
+  color: #e65018;
+}
+.quote-calculations {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: start;
+  gap: 10px;
+}
+.quote-calculations .quote-field {
+  padding-top: 8px;
+}
+.quote-toggle {
+  flex-shrink: 0;
+  padding: 6px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  background: #eeeae5;
+}
+.quote-toggle.active {
+  color: #fff;
+  background: #111;
+}
+.quote-live-total {
+  border-radius: 10px;
+  background: #fff0e8;
+  padding: 10px;
+  overflow-wrap: anywhere;
+}
+.quote-live-total > span {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: #e65018;
+}
+.quote-live-total strong {
+  display: block;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 900;
+}
+.quote-live-total small {
+  display: block;
+  font-size: 9px;
+}
+.quote-actions {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 6px;
+}
+.quote-actions .quote-small-button {
+  border-radius: 8px;
+}
+.quote-primary {
+  min-height: 42px;
+}
+.quote-editor button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.quote-preview-pane {
+  position: sticky;
+  top: 24px;
+}
+.quote-paper {
+  padding: 27px;
+  min-height: 690px;
+  background: white;
+  border: 1px solid #ded8d0;
+  box-shadow: 0 8px 12px #0002;
+  font-size: 11px;
+}
+.quote-paper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #ed501b;
+}
+.quote-paper-logo {
+  width: 65px;
+  flex-shrink: 0;
+}
+.quote-paper-header h2 {
+  font-size: clamp(20px, 2.5vw, 38px);
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+.quote-paper-header p {
+  margin-top: 10px;
+  text-align: right;
+  font-size: 12px;
+  color: #e65018;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.quote-paper-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 16px 0;
+  border-bottom: 1px solid #ddd;
+}
+.quote-paper-meta span {
+  display: block;
+  font-size: 8px;
+  color: #777;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.quote-paper-meta strong {
+  font-size: 10px;
+}
+.quote-paper-meta .quote-status {
+  color: #946200;
+}
+.quote-recipient {
+  padding: 14px 0;
+}
+.quote-recipient > span {
+  font-size: 9px;
+  color: #e65018;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.quote-recipient h3 {
+  font-size: 17px;
+  font-weight: 800;
+  margin: 3px 0 12px;
+  overflow-wrap: anywhere;
+}
+.quote-recipient > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.quote-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+  table-layout: fixed;
+}
+.quote-table th {
+  background: #111;
+  color: white;
+  padding: 10px 8px;
+  text-align: right;
+}
+.quote-table th:first-child {
+  width: 48%;
+  text-align: left;
+}
+.quote-table th:nth-child(2) {
+  width: 12%;
+}
+.quote-table td {
+  border-bottom: 1px solid #eee;
+  padding: 12px 8px;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.quote-table td:first-child {
+  text-align: left;
+}
+.quote-paper-totals {
+  width: 50%;
+  margin: 12px 0 20px auto;
+  font-size: 10px;
+}
+.quote-paper-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 0;
+}
+.quote-paper-totals .quote-total-bar {
+  background: #e65018;
+  color: white;
+  border-radius: 7px;
+  padding: 11px 8px;
+  font-size: 13px;
+  margin: 3px 0;
+}
+.quote-paper-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+  margin-top: 18px;
+}
+.quote-paper h4 {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 9px;
+}
+.quote-paper-bottom p,
+.quote-paper-observations p {
+  font-size: 10px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.quote-transfer {
+  border-radius: 10px;
+  background: #f7f5f2;
+  padding: 13px;
+}
+.quote-paper footer {
+  border-top: 1px solid #ddd;
+  margin-top: 26px;
+  padding-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  font-size: 9px;
+  color: #666;
+}
+@media (max-width: 1023px) {
+  .quote-workspace {
+    grid-template-columns: 1fr;
+    max-width: 680px;
+    padding: 14px;
+  }
+  .quote-preview-pane {
+    position: static;
+  }
+  .quote-paper-header h2 {
+    font-size: clamp(22px, 6vw, 38px);
+  }
+}
+@media (max-width: 420px) {
+  .quote-editor {
+    padding: 16px;
+  }
+  .quote-data-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .quote-data-grid > :first-child {
+    grid-column: span 2;
+  }
+  .quote-calculations {
+    grid-template-columns: 1fr 1fr;
+  }
+  .quote-live-total {
+    grid-column: span 2;
+  }
+  .quote-paper {
+    padding: 18px;
+    min-height: 560px;
+  }
+  .quote-paper-logo {
+    width: 45px;
+  }
+  .quote-paper-totals {
+    width: 65%;
+  }
+  .quote-table td,
+  .quote-table th {
+    padding: 7px 4px;
+    font-size: 9px;
+  }
 }

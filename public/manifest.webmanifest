@@ -1,7 +1,7 @@
 {
-  "name": "Subliexpresate Pedidos",
+  "name": "N?R ? Pedidos",
   "short_name": "Pedidos",
-  "description": "Gestion de pedidos y presupuestos para Subliexpresate.",
+  "description": "Gesti?n de pedidos y presupuestos para N?R ? Dise?o en Evoluci?n.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -10,16 +10,10 @@
   "theme_color": "#1778b8",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/nor-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }

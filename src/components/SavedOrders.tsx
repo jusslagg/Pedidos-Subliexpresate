@@ -59,7 +59,7 @@ export function SavedOrders({ orders, onEdit, onDeleted }: Props) {
                   </p>
                 </div>
                 <span className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-black text-brand-ink">
-                  {formatARS(total(order.items))}
+                  {formatARS(total(order.items, order))}
                 </span>
               </div>
             </button>

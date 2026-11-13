@@ -1,5 +1,7 @@
 # dependencies
 node_modules/
+.npm-cache/
+.qa/
 
 # next.js
 .next/

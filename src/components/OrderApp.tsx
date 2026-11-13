@@ -10,6 +10,7 @@ import { PinGate } from "@/components/PinGate";
 import { SavedOrders } from "@/components/SavedOrders";
 import { SalesDashboard } from "@/components/SalesDashboard";
 import { listClients, listOrders, listProducts } from "@/lib/repository";
+import { nextQuoteNumber } from "@/lib/orderFactory";
 import type { Client, FrequentProduct, Order } from "@/types/order";
 
 type View = "home" | "new" | "orders" | "agenda" | "sales" | "clients" | "products";
@@ -58,6 +59,7 @@ export function OrderApp() {
           <OrderForm
             key={editing?.id ?? "new"}
             order={editing}
+            nextNumber={nextQuoteNumber(orders)}
             clients={clients}
             products={products}
             onCancel={() => {

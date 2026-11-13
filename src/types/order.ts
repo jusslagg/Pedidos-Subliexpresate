@@ -27,6 +27,14 @@ export interface OrderItem {
 }
 
 export interface Order {
+  numero?: string;
+  validezDias?: number;
+  estadoPresupuesto?: string;
+  descuento?: number;
+  descuentoTipo?: "percent" | "amount";
+  anticipoPorcentaje?: number;
+  condiciones?: string;
+  empresa?: { nombre: string; alias: string; titular: string; formaPago: string };
   id: string;
   fecha: string;
   clienteNombre: string;

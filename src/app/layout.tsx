@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Subliexpresate | Pedidos",
-  description: "Gestion simple de pedidos y presupuestos para Subliexpresate.",
+  title: "N?R ? Dise?o en Evoluci?n | Pedidos",
+  description: "Gestion simple de pedidos y presupuestos para N?R ? Dise?o en Evoluci?n.",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/icon-192.png"
+    icon: "/nor-icon.svg",
+    shortcut: "/nor-icon.svg",
+    apple: "/nor-logo.jpg"
   },
   appleWebApp: {
     capable: true,

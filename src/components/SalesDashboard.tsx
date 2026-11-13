@@ -2,7 +2,7 @@
 
 import { PackageCheck, TrendingUp, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { formatARS, total } from "@/lib/calculations";
+import { formatARS, subtotal, total } from "@/lib/calculations";
 import { formatInputDate } from "@/lib/dates";
 import type { Order } from "@/types/order";
 
@@ -393,8 +393,8 @@ function buildReport(
   const week = groupOrders(selectedOrders, (order) => weekKey(order.fecha), weekLabel);
   const month = groupOrders(soldOrders, (order) => monthKey(order.fecha), monthLabel);
 
-  const totalAmount = soldOrders.reduce((sum, order) => sum + total(order.items), 0);
-  const selectedAmount = selectedOrders.reduce((sum, order) => sum + total(order.items), 0);
+  const totalAmount = soldOrders.reduce((sum, order) => sum + total(order.items, order), 0);
+  const selectedAmount = selectedOrders.reduce((sum, order) => sum + total(order.items, order), 0);
   const totalInvestment = investmentTotalForAllMonths(soldOrders, investments);
   const selectedInvestment = investmentTotalForOrders(selectedOrders, selectedMonth, investments);
   const totalProfit = totalAmount - totalInvestment;
@@ -450,7 +450,7 @@ function groupOrders(
       orders: 0,
       units: 0
     };
-    existing.amount += total(order.items);
+    existing.amount += total(order.items, order);
     existing.orders += 1;
     existing.units += orderUnits(order);
     map.set(key, existing);
@@ -469,7 +469,9 @@ function productRows(orders: Order[]): RankRow[] {
     order.items.forEach((item) => {
       const label = item.descripcion || "Sin descripcion";
       const existing = map.get(label) ?? { label, amount: 0, units: 0 };
-      existing.amount += Number(item.cantidad || 0) * Number(item.precioUnitario || 0);
+      const base = subtotal(order.items);
+      const discountRatio = base > 0 ? total(order.items, order) / base : 1;
+      existing.amount += Number(item.cantidad || 0) * Number(item.precioUnitario || 0) * discountRatio;
       existing.units += Number(item.cantidad || 0);
       map.set(label, existing);
     });
@@ -483,7 +485,7 @@ function rankClients(orders: Order[]): RankRow[] {
   orders.forEach((order) => {
     const label = order.clienteNombre || "Sin cliente";
     const existing = map.get(label) ?? { label, amount: 0, units: 0 };
-    existing.amount += total(order.items);
+    existing.amount += total(order.items, order);
     existing.units += orderUnits(order);
     map.set(label, existing);
   });

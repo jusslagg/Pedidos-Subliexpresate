@@ -26,7 +26,7 @@ export function PinGate({ children }: { children: React.ReactNode }) {
         </div>
         <h1 className="text-2xl font-black text-brand-ink">Acceso</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Ingresá el PIN para gestionar pedidos de Subliexpresate.
+          Ingresá el PIN para gestionar pedidos de N?R.
         </p>
         <form
           className="mt-6 space-y-4"

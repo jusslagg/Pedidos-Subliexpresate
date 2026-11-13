@@ -9,6 +9,12 @@ export function formatInputDate(value: string): string {
   return `${day}-${month}-${year.slice(-2)}`;
 }
 
+export function formatQuoteDate(value: string): string {
+  if (!value) return "";
+  const [year, month, day] = value.split("-");
+  return `${day}/${month}/${year}`;
+}
+
 export function sortByDateDesc<T extends { fecha: string; updatedAt: string }>(items: T[]): T[] {
   return [...items].sort((a, b) => {
     const dateDiff = b.fecha.localeCompare(a.fecha);
